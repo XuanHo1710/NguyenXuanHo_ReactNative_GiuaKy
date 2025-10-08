@@ -9,14 +9,14 @@ import {
   Switch,
 } from 'react-native';
 
-import React, {useState} from 'react'
+import React, { useState } from 'react';
 
-const TaskItem = ({ item, saveEdit }) => {
+const TaskItem = ({ item, saveEdit, deleteTodo }) => {
   const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState(item.name);
 
   return (
-     <View
+    <View
       style={{
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -30,25 +30,44 @@ const TaskItem = ({ item, saveEdit }) => {
           {item.name}
         </Text>
       ) : (
-        <TextInput onChangeText={setName} style={{borderWidth: 1, padding: 5, width: "70%"}} value={name} />
+        <TextInput
+          onChangeText={setName}
+          style={{ borderWidth: 1, padding: 5, width: '70%' }}
+          value={name}
+        />
       )}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
         {editingId === null ? (
           <>
-            <Switch value={item.completed} />
+            <Switch
+              onPointerDown={() =>
+                saveEdit({
+                  id: item.id,
+                  name: item.name,
+                  completed: !item.completed,
+                })
+              }
+              value={item.completed}
+            /> 
             <Button
               onPress={() => {
-                 setEditingId(item.id);
+                setEditingId(item.id);
               }}
               color="black"
               title="Edit"
             />
-            <Button color="black" title="Delete" />
+            <Button
+              onPress={() => {
+                deleteTodo(item.id);
+              }}
+              color="black"
+              title="Delete"
+            />
           </>
         ) : (
           <Button
             onPress={() => {
-              saveEdit({id: item.id, name: name, completed: item.completed})
+              saveEdit({ id: item.id, name: name, completed: item.completed });
               setEditingId(null);
             }}
             color="black"
@@ -57,7 +76,7 @@ const TaskItem = ({ item, saveEdit }) => {
         )}
       </View>
     </View>
-  )
-}
+  );
+};
 
 export default React.memo(TaskItem);

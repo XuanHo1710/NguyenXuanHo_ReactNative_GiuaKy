@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import TaskItem from './components/TaskItem';
+import TaskItemCompleted from './components/TaskItemCompleted';
 import axios from 'axios';
 export default function App() {
   // ---------------- STATE ----------------
@@ -24,7 +25,6 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [newTodo, setNewTodo] = useState('');
-  const [editingText, setEditingText] = useState('');
   const inputRef = useRef(null);
 
   // ---------------- API BASE ----------------
@@ -121,20 +121,50 @@ export default function App() {
         </View>
 
         {/* Loading hoặc danh sách */}
-        {loading ? (
-          <ActivityIndicator size="large" color="blue" />
-        ) : (
-          <FlatList
-            data={todoList}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <TaskItem item={item} saveEdit={saveEdit} />
-            )}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
-          />
-        )}
+        <View style={{ flex: 4 }}>
+          {loading ? (
+            <ActivityIndicator size="large" color="blue" />
+          ) : (
+            <FlatList
+              data={todoList.filter(item => !item.completed)}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TaskItem
+                  item={item}
+                  saveEdit={saveEdit}
+                  deleteTodo={deleteTodo}
+                />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
+          )}
+        </View>
+
+        <Text style={{ color: 'red', fontSize: 20, fontWeight: '500' }}>
+          Task completed
+        </Text>
+        <View style={{flex: 2}}>
+          {loading ? (
+            <ActivityIndicator size="large" color="blue" />
+          ) : (
+            <FlatList
+              data={todoList.filter((item) => item.completed)}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TaskItemCompleted
+                  item={item}
+                  saveEdit={saveEdit}
+                  deleteTodo={deleteTodo}
+                />
+              )}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            />
+          )}
+        </View>
       </SafeAreaView>
     </SafeAreaProvider>
   );
